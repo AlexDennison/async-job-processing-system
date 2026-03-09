@@ -12,3 +12,10 @@ async def submit_job(job: JobCreate):
         "job_id": job_id,
         "status": "submitted"
     }
+
+@router.get("/jobs/{job_id}")
+async def get_job(job_id: str):
+    return {
+        "job_id": job_id,
+        "status": "pending"
+    }
