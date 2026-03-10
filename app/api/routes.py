@@ -4,31 +4,28 @@ from app.core.deps import get_db
 from app.core.job_status import JobStatus
 from app.models.job import Job
 from app.schemas.job import JobCreate
+from app.services import job_service
 
 router = APIRouter()
 
 @router.post("/jobs")
 def submit_job(job: JobCreate, db: Session = Depends(get_db)):
 
-    db_job = Job(
-        type=job.type,
-        payload=job.payload,
-        status=JobStatus.PENDING.value
+    new_job = job_service.submit_job(
+        db=db,
+        job_type=job.type,
+        payload=job.payload
     )
 
-    db.add(db_job)
-    db.commit()
-    db.refresh(db_job)
-
     return {
-        "job_id": db_job.id,
-        "status": db_job.status
+        "job_id": new_job.id,
+        "status": new_job.status
     }
 
 @router.get("/jobs/{job_id}")
 def get_job(job_id: str, db: Session = Depends(get_db)):
 
-    job = db.query(Job).filter(Job.id == job_id).first()
+    job = job_service.get_job_status(db, job_id)
 
     if not job:
         return {"error": "job not found"}
