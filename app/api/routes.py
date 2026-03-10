@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.deps import get_db
+from app.core.job_status import JobStatus
 from app.models.job import Job
 from app.schemas.job import JobCreate
 
@@ -12,7 +13,7 @@ def submit_job(job: JobCreate, db: Session = Depends(get_db)):
     db_job = Job(
         type=job.type,
         payload=job.payload,
-        status="PENDING"
+        status=JobStatus.PENDING.value
     )
 
     db.add(db_job)
